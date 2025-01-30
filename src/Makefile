@@ -2,8 +2,8 @@ FUNC := g++
 output := -o 
 copt := -c 
 SRC_DIR := ./
-OBJ_DIR := ./../bin/
-FLAGS := -O3
+OBJ_DIR := ./
+FLAGS := -O3 -Werror
 
 CPP_FILES := $(wildcard *.cpp)
 OBJ_FILES := $(addprefix $(OBJ_DIR),$(notdir $(CPP_FILES:.cpp=.obj)))
@@ -14,7 +14,7 @@ TEXTURE_OBJ_FILES := $(addprefix $(OBJ_DIR)Textures/,$(notdir $(TEXTURE_CPP_FILE
 all: $(SRC_DIR)texture $(OBJ_FILES)
 
 texture:
-	cd $(SRC_DIR)Textures && make -f gccMakefile
+	cd $(SRC_DIR)Textures && make
 
 $(OBJ_DIR)vector.obj: $(SRC_DIR)vector.cpp $(SRC_DIR)vector.h
 	$(FUNC) $(output)$(OBJ_DIR)vector.obj $(copt) $(SRC_DIR)vector.cpp $(FLAGS)

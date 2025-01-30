@@ -45,7 +45,6 @@ class Shape{
    double yaw, pitch, roll, xsin, xcos, ysin, ycos, zsin, zcos;
    Vector center;
    Texture* texture;
-//   double opacity, reflection, ambience
    double textureX, textureY, mapX, mapY, mapOffX, mapOffY;
    Texture* normalMap;
    virtual double getIntersection(Ray ray, unsigned int* data1, double* data2, double* data3) = 0;

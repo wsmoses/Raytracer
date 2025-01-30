@@ -19,9 +19,8 @@ double findnoise(int x,int y)
 
 double antialias(double x,double y)
 {
- double floorx=(double)((int)x);//This is kinda a cheap way to floor a double integer.
- double floory=(double)((int)y);
-// printf("%f %f\n", floorx, floory);
+ double floorx=floor(x);
+ double floory=floor(y);
  double s,t,u,v;//Integer declaration
  s=findnoise(floorx,floory);
  t=findnoise(floorx+1,floory);

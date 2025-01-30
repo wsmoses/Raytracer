@@ -3,7 +3,7 @@
 Plane::Plane(const Vector &c, Texture* t, double ya, double pi, double ro, double tx, double ty) : Shape(c, t, ya, pi, ro), vect(c), right(c), up(c){
    textureX = tx; textureY = ty;
    setAngles(yaw, pitch, roll);
-   normalMap = '\0';
+   normalMap = NULL;
    mapX = textureX; mapY = textureY;
 }
 
@@ -110,20 +110,7 @@ bool Plane::getLightIntersection(Ray ray, double* fill){
       return false;
     }
 }
-/*
-bool Plane::getLightIntersection(Ray ray, double* toFill){
-   const double t = ray.vector.dot(vect);
-   const double norm = vect.dot(ray.point)+d;
-   const double r = -norm/t;
-   if(r<=0. || t>=1.) return false;
-   if(texture->constant()){
-    unsigned char a[3];
-    double o, r, g
-   }
-   *data2 = inf;
-   return (r>0)?r:inf;
-}
-*/
+
 void Plane::move(){
    d = -vect.dot(center);
 }

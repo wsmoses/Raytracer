@@ -64,12 +64,6 @@ Mesh::Mesh(char* pointL, unsigned int pointCount, char* polyL, unsigned int poly
       }
    free(points);
 }
-/*
-Mesh::Mesh(const Vector &cente, Texture* t, double ya, double pi, double ro, double tx, double ty, Shape* data, unsigned int len){
-polyCount = len;
-shapes = data;
-refreshBounds();
-} */
 
 void Mesh::refreshBounds(Vector* points, unsigned int length) {
    int i; 
@@ -94,8 +88,6 @@ void Mesh::refreshBounds(Vector* points, unsigned int length) {
          boundCenter.z = (radius*boundCenter.z + oldc_to_new_c*points[i].z)/dis;
       }
    }
-//   radius=10000000.;
-   //printf("(%f %f %f) %f\n", boundCenter.x, boundCenter.y, boundCenter.z, radius);
 }
 
 bool Mesh::getLightIntersection(Ray ray, double* fill){

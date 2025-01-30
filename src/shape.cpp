@@ -83,10 +83,7 @@ void calcColor(unsigned char* toFill,Autonoma* c, Ray ray, unsigned int depth){
             calcColor(col, c, nextRay, depth+1);
             toFill[0]= (unsigned char)(toFill[0]*opacity+col[0]*(1-opacity));
             toFill[1]= (unsigned char)(toFill[1]*opacity+col[1]*(1-opacity));
-            toFill[2]= (unsigned char)(toFill[2]*opacity+col[2]*(1-opacity));
-        
-         // if(toFill[0]==255 && toFill[1]==255 && toFill[2]==255) printf("WTF\n");
-          //  printf("%d %d %d ||%d %d %d %f %f %f\n", toFill[0], toFill[1], toFill[2], col[0], col[1], col[2], nextRay.point.x, nextRay.point.y, nextRay.point.z);
+            toFill[2]= (unsigned char)(toFill[2]*opacity+col[2]*(1-opacity));        
          }
          if(reflection>1e-6){
             Vector norm = curShape->getNormal(intersect, &data1, &data2, &data3).normalize();

@@ -2,7 +2,7 @@
 
 Sphere::Sphere(const Vector &c, Texture* t, double ya, double pi, double ro, double rad): Shape(c, t, ya, pi, ro){
   textureX = textureY = 1.;
-  normalMap = '\0';
+  normalMap = NULL;
    radius = rad;
 }
 bool Sphere::getLightIntersection(Ray ray, double* fill){
@@ -29,7 +29,6 @@ bool Sphere::getLightIntersection(Ray ray, double* fill){
      return false;
    }
     else{   
- //     if(texture->opacity>1-1E-6) return true;   
       Vector point = ray.point+ray.vector*time;
       double data2 = (center.y-point.y+radius)/(2*radius);
       double data3 = atan2( point.z-center.z, point.x-center.x);
@@ -68,7 +67,6 @@ void Sphere::getColor(unsigned char* toFill, double* amb, double* op, double* re
      *data2 = atan2( ray.point.z-center.z, ray.point.x-center.x);
      }
      
-//  printf("getting %f %f %f %f\n", *data2, *data3, fix((yaw+*data2)/M_TWO_PI/textureX),fix((pitch/M_TWO_PI-(*data3))/textureY));
    texture->getColor(toFill, amb, op, ref,fix((yaw+*data2)/M_TWO_PI/textureX),fix((pitch/M_TWO_PI-(*data3))/textureY));
 }
 Vector Sphere::getNormal(Vector point,unsigned int* data1, double* data2, double* data3){

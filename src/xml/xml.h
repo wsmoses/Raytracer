@@ -113,67 +113,6 @@ template <class A,class B> class ListMapNode{
       second = b;
    }
 };
-   /*template <class A,class B> class LinkedMap{
-   unsigned int size;
-   void (*eqv)(A a,B b);
-   ListMapNode<A,B> *start, *end;
-   T pollFirst(){
-      ListNode<T> *temp = start;
-      size--;
-      start = temp->after;
-      T t = temp->data;
-      temp->~ListNode<T>();
-      return t;
-   }
-   T pollLast(){
-      ListNode<T> *temp = end;
-      size--;
-      end = temp->before;
-      T t = temp->data;
-      temp->~ListNode<T>();
-      return t;
-   }
-   void addFirst(T t){
-      if(size==0){
-         start = end = new ListNode<T>(t);
-      }
-      else{
-         ListNode<T> *t = new ListNode<T>(t);
-         t->next = start;
-         start = t;
-      }
-      size++;
-   }
-   void addLast(T t){
-      if(size==0){
-         start = end = new ListNode<T>(t);
-      }
-      else{
-         end->next = new ListNode<T>(t);
-         end = end->next;
-      }
-      size++;
-   }
-   T get(A a){
-      int pos = 0;
-      ListMapNode<T> *cur = start;
-      while(pos<i){ cur = cur->next; pos++;}
-      return cur;
-   }
-   return 0;
-  }
-  LinkedMap(void (*fun)(A a,B b)){size = 0; eqv = fun;}
-  LinkedMap(){size = 0; eqv = fun;}
-  ~LinkedMap(){
-    while(size>0){
-      ListNode<T> *ln = start;
-      start = start->next;
-      ln->~ListNode<T>();
-      size--;
-    }
-    }
-};
-*/
 
 class XMLParser{
   

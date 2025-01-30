@@ -16,13 +16,8 @@
 #include "src/Textures/colortexture.h"
 #include<stdio.h>
 #include<stdlib.h>
-#include<omp.h>
 #include <iostream>
 using namespace std;
-#if defined(_MSC_VER)
-#include<fcntl.h>
-#include<errno.h>
-#endif
 
 unsigned char* getColor(unsigned char a, unsigned char b, unsigned char c){
    unsigned char* r = (unsigned char*)malloc(sizeof(unsigned char)*3);
@@ -32,7 +27,7 @@ unsigned char* getColor(unsigned char a, unsigned char b, unsigned char c){
    return r;
 }
      
-const int W = 1000, H = 1000;
+int W = 1000, H = 1000;
 
 unsigned char* DATA = (unsigned char*)malloc(W*H*3*sizeof(unsigned char));
 unsigned char get(int i, int j, int k){
@@ -48,7 +43,6 @@ void set(int i, int j, unsigned char r, unsigned char g, unsigned char b){
 }
 
 void refresh(Autonoma* c){
-  #pragma omp parallel for shared(c) shared(DATA) schedule(dynamic)
    for(int n = 0; n<H*W; ++n) 
    { 
       Vector ra = c->camera.forward+((double)(n%W)/W-.5)*((c->camera.right))+(.5-(double)(n/W)/H)*((c->camera.up));
@@ -57,87 +51,204 @@ void refresh(Autonoma* c){
 }
 
 void outputPPM(FILE* f){
-
    fprintf(f, "P6 %d %d 255 ", W, H);
    fwrite(DATA, 1, W*H * 3, f);
-      /*  int i, j;
-   for(j = 0; j<H; j++){
-      for(i = 0; i<W; i++){
-      
-         fprintf(f, "%c%c%c", 255, 0, 0);
-      }
-   }*/
-
-/*
-   fprintf(f, "P3 %d %d 255 ", W, H);
-   int i, j;
-   for(j = 0; j<H; j++){
-      for(i = 0; i<W; i++){
-      
-         fprintf(f, "%u %u %u ", get(i, j, 0), get(i, j, 1), get(i, j, 2));
-      }
-   }
-   */
-/*
-      fprintf(f, "P3\n%d %d\n255\n", W, H);
-   int i, j;
-   for(j = 0; j<H; j++){
-      for(i = 0; i<W; i++){
-         fprintf(f, "%d %d %d\n", get(i, j, 0), get(i, j, 1), get(i, j, 2));
-      }
-   }*/
 }
 
 void outputPPM(char* file){
-
-#if defined(_MSC_VER)
-   FILE* f = fopen(file, "wb");
-#else
    FILE* f = fopen(file, "w");
-#endif
    outputPPM(f);
    fclose(f);
 }
 void output(char* file){
-
    char command[2000];
    FILE* f;
-   /*
-   sprintf(command, "%s.ppm", file);
-   f = fopen(command, "w");
-   outputPPM(f);
-  fclose(f);*/
-   
-   sprintf(command, "convert ppm:- %s", file);
+   snprintf(command, sizeof(command), "convert ppm:- %s", file);
    printf("%s\n",command);
-#if defined(_MSC_VER)
-   f = popen(command, "wb");
-#else
-
    f = popen(command, "w");
-#endif
- //  FILE* f = popen("cat", "w");
- //FILE* f = fopen("ola.ppm", "wb");
    outputPPM(f);
    fclose(f);
 }
 
-int main(int argv, char** argc){
-
-#if defined(_MSC_VER)
-int err = _set_fmode(_O_BINARY);
-   if (err == EINVAL)
-   {
-      printf( "Invalid mode.\n");
-      return 1;
+Texture* parseTexture(FILE* f, bool allowNull) {
+   char texture_type[80];
+   if (fscanf(f, "%s", texture_type) == EOF) {
+      printf("Could not find texture type\n");
+      exit(1);
    }
-#endif
+   if (strcmp(texture_type, "null")) {
+      if (allowNull)
+         return NULL;
+      printf("Null texture not permitted\n");
+      exit(1);
+   }
+   if (strcmp(texture_type, "color")) {
+      int r, g, b;
+      double opacity, reflection, ambient;
+      if (fscanf(f, "%d %d %d %lf %lf %lf\n", &r, &g, &b, &opacity, &reflection, &ambient) == EOF) {
+         printf("Could not read <r> <g> <b> <opacity> <reflection> <ambient>\n");
+         exit(1);
+      }
+      return new ColorTexture((unsigned char)r, (unsigned char)g, (unsigned char)b, opacity, reflection, ambient);
+   }
+   if (strcmp(texture_type, "fractal")) {
+      double x, y;
+      double xoff, yoff;
+      double evolution;
+      if (fscanf(f, "%lf %lf %lf %lf %lf\n", &x, &y, &xoff, &yoff, &evolution) == EOF) {
+         printf("Could not read <r> <g> <b> <opacity> <reflection> <ambient>\n");
+         exit(1);
+      }
+      return new FractalNoise(x, y, xoff, yoff, evolution);
+   }
+   if (strcmp(texture_type, "image")) {
+      char image_file[100];
+      if (fscanf(f, "%s\n", image_file) == EOF) {
+         printf("Could not read <image path>\n");
+         exit(1);
+      }
+      return new ImageTexture(image_file);
+   }
+   if (strcmp(texture_type, "mandel")) {
+      double x, y;
+      double h, w;
+      int escape;
+      if (fscanf(f, "%lf %lf %lf %lf %d\n", &x, &y, &h, &w, &escape) == EOF) {
+         printf("Could not read <x> <y> <height> <width> <escape limit>\n");
+         exit(1);
+      }
+      return new MandelTexture(x, y, h, w, escape);
+   }
 
-ImageTexture* ola = new ImageTexture(2, 2);
+   printf("Unknown texture type %s\n", texture_type);
+   exit(1);
+}
+
+Autonoma* createInputs(const char* inputFile) {
+   ImageTexture* ola = new ImageTexture(2, 2);
    ola->setColor(0, 0, ola->setColor(1, 1, 0, 0, 0));
    ola->setColor(1, 0, ola->setColor(0, 1, 255, 255, 255));
    ola->reflection = .2;
    
+   double camera_x = 0;
+   double camera_y = 2;
+   double camera_z = 0;
+   double yaw = 0;
+   double pitch = 0;
+   double roll = 0;
+   char background[80] = "images/skybox.jpg";
+
+   FILE *f = NULL;
+   if (inputFile) {
+      FILE *f = fopen(inputFile, "r");
+      if (!f) {
+         printf("Could not open input file %s\n", inputFile);
+         exit(1);
+      }
+      if (fscanf(f, "%lf %lf %lf %lf %lf %lf\n", &camera_x, &camera_y, &camera_z, &yaw, &pitch, &roll) == EOF) {
+         printf("Could not read <camera_x> <camera_y> <camera_z> <yaw> <pitch> <roll>\n");
+         exit(1);
+      }
+      if (fscanf(f, "%s\n", background) == EOF) {
+         printf("Could not read <background image file path>\n");
+         exit(1);
+      }
+   }
+   Autonoma* MAIN_DATA = new Autonoma(Camera(Vector(camera_x, camera_y, camera_z), yaw, pitch, roll),new ImageTexture(background));
+
+   if (f) {
+      char object_type[80];
+      while (fscanf(f, "%s", object_type) != EOF) {
+         if (strcmp(object_type, "light")) {
+            double light_x, light_y, light_z;
+            int color_r, color_g, color_b;
+            if (fscanf(f, "%lf %lf %lf %d %d %d\n", &light_x, &light_y, &light_z, &color_r, &color_g, &color_b) == EOF) {
+               printf("Could not read <light_x> <light_y> <light_z> <color_r> <color_g> <color_b>\n");
+               exit(1);
+            }
+            Light *light = new Light(Vector(light_x, light_y, light_z), getColor(color_r, color_g, color_b));
+            MAIN_DATA->addLight(light);
+         } else if (strcmp(object_type, "plane")) {
+            double plane_x, plane_y, plane_z;
+            double yaw, pitch, roll;
+            double tx, ty;
+            if (fscanf(f, "%lf %lf %lf %lf %lf %lf %lf %lf\n", &plane_x, &plane_y, &plane_z, &yaw, &pitch, &roll, &tx, &ty) == EOF) {
+               printf("Could not read <plane_x> <plane_y> <plane_z> <yaw> <pitch> <roll> <tx> <ty>\n");
+               exit(1);
+            }
+            Texture *texture = parseTexture(f, false);
+            Shape *shape = new Plane(Vector(plane_x, plane_y, plane_z), texture, yaw, pitch, roll, tx, ty);
+            MAIN_DATA->addShape(shape);
+            shape->normalMap = parseTexture(f, true);
+         } else if (strcmp(object_type, "disk")) {
+            double disk_x, disk_y, disk_z;
+            double yaw, pitch, roll;
+            double tx, ty;
+            if (fscanf(f, "%lf %lf %lf %lf %lf %lf %lf %lf\n", &disk_x, &disk_y, &disk_z, &yaw, &pitch, &roll, &tx, &ty) == EOF) {
+               printf("Could not read <disk_x> <disk_y> <disk_z> <yaw> <pitch> <roll> <tx> <ty>\n");
+               exit(1);
+            }
+            Texture *texture = parseTexture(f, false);
+            Shape* shape = new Disk(Vector(disk_x, disk_y, disk_z), texture, yaw, pitch, roll, tx, ty);
+            MAIN_DATA->addShape(shape);
+            shape->normalMap = parseTexture(f, true);
+         } else if (strcmp(object_type, "box")) {
+            double box_x, box_y, box_z;
+            double yaw, pitch, roll;
+            double tx, ty;
+            if (fscanf(f, "%lf %lf %lf %lf %lf %lf %lf %lf\n", &box_x, &box_y, &box_z, &yaw, &pitch, &roll, &tx, &ty) == EOF) {
+               printf("Could not read <box_x> <box_y> <box_z> <yaw> <pitch> <roll> <tx> <ty>\n");
+               exit(1);
+            }
+            Texture *texture = parseTexture(f, false);
+            Shape* shape = new Box(Vector(box_x, box_y, box_z), texture, yaw, pitch, roll, tx, ty);
+            MAIN_DATA->addShape(shape);
+            shape->normalMap = parseTexture(f, true);
+         } else if (strcmp(object_type, "triangle")) {
+            double x1, y1, z1;
+            double x2, y2, z2;
+            double x3, y3, z3;
+            if (fscanf(f, "%lf %lf %lf %lf %lf %lf %lf %lf %lf\n", &x1, &y1, &z1, &x2, &y2, &z2, &x3, &y3, &z3) == EOF) {
+               printf("Could not read <x1> <y1> <z1> <x2> <y2> <z2> <x3> <y3> <z3>\n");
+               exit(1);
+            }
+            Texture *texture = parseTexture(f, false);
+            Shape* shape = new Triangle(Vector(x1, y1, z1), Vector(x2, y2, z2), Vector(x3, y3, z3), texture);
+            MAIN_DATA->addShape(shape);
+            shape->normalMap = parseTexture(f, true);
+         } else if (strcmp(object_type, "sphere")) {
+            double sphere_x, sphere_y, sphere_z;
+            double yaw, pitch, roll;
+            double radius;
+            if (fscanf(f, "%lf %lf %lf %lf %lf %lf %lf\n", &sphere_x, &sphere_y, &sphere_z, &yaw, &pitch, &roll, &radius) == EOF) {
+               printf("Could not read <sphere_x> <sphere_y> <sphere_z> <yaw> <pitch> <roll> <radius>\n");
+               exit(1);
+            }
+            Texture *texture = parseTexture(f, false);
+            Shape* shape = new Sphere(Vector(sphere_x, sphere_y, sphere_z), texture, yaw, pitch, roll, radius);
+            MAIN_DATA->addShape(shape);
+            shape->normalMap = parseTexture(f, true);
+         } else if (strcmp(object_type, "mesh")) {
+             char point_filepath[100];
+             char poly_filepath[100];
+             int num_points;
+             int num_polygons;
+            if (fscanf(f, "%s %d %s %d\n", point_filepath, &num_points, poly_filepath, &num_polygons) == EOF) {
+               printf("Could not read <point filepath> <num_points> <polygons filepath> <num_polygons>\n");
+               exit(1);
+            }
+            Texture *texture = parseTexture(f, false);
+            Shape* shape = new Mesh(point_filepath, num_points, poly_filepath, num_polygons, texture);
+            MAIN_DATA->addShape(shape);
+            shape->normalMap = parseTexture(f, true);
+         } else {
+           printf("Unknown object type %s\n", object_type);
+           exit(1);
+         }
+      }
+   }
+
+
 //  ola->normalMap = new ImageTexture("images/sea.jpg");
 //  ola->mapX = ola->mapY = 10;
 
@@ -148,9 +259,8 @@ else ola->setColor(i%20, i/20, 255,255,0);
 }*/
   // Autonoma* MAIN_DATA = new Autonoma(Camera(Vector(1.502048-1, 0.582642, -2.499250), M_PI_2, 0, 0), new ImageTexture("images/skybox.jpg"));
 //    Autonoma* MAIN_DATA = new Autonoma(Camera(Vector(1.502048, 0.582642, -2.499250-1), M_PI_2, 0, 0), new ImageTexture("images/skybox.jpg"));
- cout << "HM" << endl << flush;
- Autonoma* MAIN_DATA = new Autonoma(Camera(Vector(0, 2, 0), 0, 0, 0),new ImageTexture("images/skybox.jpg"));
- cout << "HM" << endl << flush;
+ 
+
  MAIN_DATA->addLight(new Light(Vector(0, 5, 0), getColor(255, 255, 255)));
   Texture* ft = new ColorTexture(150,150,150);
   ft->reflection = 0;
@@ -229,42 +339,211 @@ b->mapY = 1.;*/
   // MAIN_DATA->addShape(pl);
   // pl->normalMap = normal;
   // pl->mapX = pl->mapY = 1;
-   
-   int frame;
-   int frameLen = 1;
-   char command[200];
-   printf("loaded\n");
-   
-//   omp_set_num_threads(1);
-   for(frame = 0; frame<frameLen; frame++){
-   
+   return MAIN_DATA;
+}
+
+double identity(double x, double from, double to) {
+   return (1 - x) * from + x * to;
+}
+double expfn(double x, double from, double to) {
+   return (to - from) * exp(10 * x) / exp(10) + from;
+}
+double sinfn(double x, double from, double to) {
+   return (to - from) * sin(x * 6.28) + from;
+}
+
+void setFrame(const char* animateFile, Autonoma* MAIN_DATA, int frame, int frameLen) {
+   if (animateFile) {
+      char object_type[80];
+      char transition_type[80];
+      int obj_num;
+      char field_type[80];
+      double from;
+      double to;
+      FILE* f = fopen(animateFile, "r");
+      while (fscanf(f, "%s %s %d %s %lf %lf", transition_type, object_type, &obj_num, field_type, &from, &to) != EOF) {
+         double (*func)(double, double, double);
+         if (strcmp(transition_type, "linear")) {
+            func = identity;
+         } else if (strcmp(transition_type, "exp")) {
+            func = expfn;
+         } else if (strcmp(transition_type, "sin")) {
+            func = sinfn;
+         } else {
+            printf("Unknown transition type %s, expected one of linear, exp, or sin\n", transition_type);
+            exit(1);
+         }
+         double result = func((double)frame / frameLen, from, to);
+
+         if (strcmp(object_type, "camera")) {
+            if (strcmp(field_type, "yaw")) {
+               MAIN_DATA->camera.setYaw(result);
+            } else if (strcmp(field_type, "pitch")) {
+               MAIN_DATA->camera.setPitch(result);
+            } else if (strcmp(field_type, "roll")) {
+               MAIN_DATA->camera.setRoll(result);
+            } else if (strcmp(field_type, "x")) {
+               MAIN_DATA->camera.focus.x = result;
+            } else if (strcmp(field_type, "y")) {
+               MAIN_DATA->camera.focus.y = result;
+            } else if (strcmp(field_type, "z")) {
+               MAIN_DATA->camera.focus.y = result;
+            } else {
+               printf("Unknown camera field_type %s, expected one of yaw, pitch, roll, x, y, z\n", field_type);
+               exit(1);
+            }
+         } else if (strcmp(object_type, "object")) {
+            ShapeNode* node = MAIN_DATA->listStart;
+            for (int i=0; i<obj_num; i++) {
+               if (node == MAIN_DATA->listEnd) {
+                  printf("Could not find object number %d\n", obj_num);
+                  exit(1);
+               }
+               node = node->next;
+            }
+            Shape* shape = node->data;
+
+            if (strcmp(field_type, "yaw")) {
+               shape->setYaw(result);
+            } else if (strcmp(field_type, "pitch")) {
+               shape->setPitch(result);
+            } else if (strcmp(field_type, "roll")) {
+               shape->setRoll(result);
+            } else if (strcmp(field_type, "textureX")) {
+               shape->textureX = result;
+            } else if (strcmp(field_type, "textureY")) {
+               shape->textureY = result;
+            } else if (strcmp(field_type, "mapX")) {
+               shape->mapX = result;
+            } else if (strcmp(field_type, "mapX")) {
+               shape->mapX = result;
+            } else if (strcmp(field_type, "mapOffX")) {
+               shape->mapOffX = result;
+            } else if (strcmp(field_type, "mapOffY")) {
+               shape->mapOffY = result;
+            } else {
+               printf("Unknown shape field_type %s, expected one of yaw, pitch, roll, textureX, textureY, mapOffX, mapOffY\n", field_type);
+               exit(1);
+            }
+         } else {
+            printf("Unknown object_type %s, expected one of camera, object\n", field_type);
+            exit(1);
+         }
+      }
+   }
     //  mand->setYaw(exp((double)frame/48)); 
      // mars->setYaw(-(double)frame/24);
-      //MAIN_DATA->camera.setPitch(M_PI*frame/frameLen);
-   //   MAIN_DATA->camera.setYaw(2*M_PI*(.25-(double)frame/frameLen));
-   //   MAIN_DATA->camera.focus.z = -2.499250-sin(2*M_PI*frame/frameLen);
-   //   MAIN_DATA->camera.focus.x = 1.502048-cos(2*M_PI*frame/frameLen);
+
+   MAIN_DATA->camera.setPitch(M_PI*frame/frameLen);
+   MAIN_DATA->camera.setYaw(2*M_PI*(.25-(double)frame/frameLen));
+   MAIN_DATA->camera.focus.z = -2.499250-sin(2*M_PI*frame/frameLen);
+   MAIN_DATA->camera.focus.x = 1.502048-cos(2*M_PI*frame/frameLen);
+
     //   pl->mapOffY = (double)frame/48;
     //   mars->setYaw((double)-frame/frameLen*M_TWO_PI);
     //   cl->setYaw((double)frame/48*M_TWO_PI);
-      refresh(MAIN_DATA);
-      
-     
-     // sprintf(command, "output/tempfile.ppm", frame);
-     // outputPPM(command);
-      
-      
-      sprintf(command, "TEWWG.png", frame);
-      //system(command);
-      output(command);
-      
-      
-      printf("Done--%7d|\n", frame);
+
+   refresh(MAIN_DATA);
+}
+
+int main(int argc, const char** argv){
+
+   int frameLen = 1;
+   const char* inFile = NULL;
+   const char* animateFile = NULL;
+   const char* outFile = NULL;
+   bool toMovie = true;
+   for (int i=1; i<argc; i++) {
+      if (strcmp(argv[i], "-H")) {
+         if (i + 1 >= argc) {
+            printf("Error -H option must be followed by an integer height");
+         }
+         H = atoi(argv[i+1]);
+         i++;
+         continue;
+      }
+      if (strcmp(argv[i], "-W")) {
+         if (i + 1 >= argc) {
+            printf("Error -W option must be followed by an integer width");
+         }
+         H = atoi(argv[i+1]);
+         i++;
+         continue;
+      }
+      if (strcmp(argv[i], "-F")) {
+         if (i + 1 >= argc) {
+            printf("Error -F option must be followed by an integer number of frames");
+         }
+         frameLen = atoi(argv[i+1]);
+         i++;
+         continue;
+      }
+      if (strcmp(argv[i], "-o")) {
+         if (i + 1 >= argc) {
+            printf("Error -o option must be followed by an output file path");
+         }
+         outFile = argv[i+1];
+         i++;
+         continue;
+      }
+      if (strcmp(argv[i], "-i")) {
+         if (i + 1 >= argc) {
+            printf("Error -i option must be followed by an input file path");
+         }
+         inFile = argv[i+1];
+         i++;
+         continue;
+      }
+      if (strcmp(argv[i], "-a")) {
+         if (i + 1 >= argc) {
+            printf("Error -a option must be followed by an animation input file path");
+         }
+         animateFile = argv[i+1];
+         i++;
+         continue;
+      }
+      if (strcmp(argv[i], "--movie")) {
+         toMovie = true;
+         continue;
+      }
+      if (strcmp(argv[i], "--no-movie")) {
+         toMovie = false;
+         continue;
+      }
+      if (strcmp(argv[i], "--help")) {
+         printf("Usage %s [-H <height>] [-W <width>] [-F <framecount>] [--movie] [--no-movie] [--help] [-o <outfile>] [-i <infile>]", argv[0]);
+         return 0;
+      }
+      printf("Unknown option %s, look at %s --help\n", argv[i], argv[0]);
+      return 1;
    }
-//system("ffmpeg -r 24 -i output/frame%07d.png -vcodec ffv1 output/out.avi && ffmpeg -i output/out.avi -c:v libx264 -preset veryslow -qp 0 -r 24 outputA.mp4");
+
+   if (outFile == NULL) {
+      if (frameLen == 1) {
+         outFile = "output.png";
+      } else {
+         outFile = "output.mp4";
+      }
+   }
+
+   Autonoma* MAIN_DATA = createInputs(inFile);
    
-   //system("ffmpeg -r 24 -i output/frame%07d.png -vcodec ffv1 -sameq output/out.avi && ffmpeg -i output/out.avi -c:v libx264 -preset veryslow -qp 0 -r 24 outputA.mp4 && rm output/out.avi");
+   int frame;
+   char command[200];
    
+   for(frame = 0; frame<frameLen; frame++) {
+      setFrame(animateFile, MAIN_DATA, frame, frameLen);      
+      if (frameLen == 1) {
+         snprintf(command, sizeof(command), "%s", outFile);    
+      } else {
+         snprintf(command, sizeof(command), "%s.tmp.%d.png", outFile, frame);
+      }
+      output(command);      
+      printf("Done Frame %7d|\n", frame);
+   }
+   if (frameLen > 1 && toMovie) {
+      snprintf(command, sizeof(command), "ffmpeg -r 24 -i %s.tmp.%%07d.png -vcodec ffv1 -sameq %s.tmp.avi && ffmpeg -i %s.tmp.avi -c:v libx264 -preset veryslow -qp 0 -r 24 %s", outFile, outFile, outFile, outFile);
+   }   
    return 0;
    
 }

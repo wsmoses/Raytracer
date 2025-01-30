@@ -29,5 +29,5 @@ double fix(double a);
 char lowerCase(char c);
 
 int fpeek(FILE* f);
-bool extensionEquals(char* a, char* knownExt);
+bool extensionEquals(char* a, const char* knownExt);
 #endif

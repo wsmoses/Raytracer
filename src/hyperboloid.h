@@ -1,5 +1,5 @@
-#ifndef __HYPERBOLOID_H__
-#define __HYPREBOLOID_H__
+#pragma once
+
 #include "shape.h"
 
 class Hyperboloid : public Shape{
@@ -11,6 +11,3 @@ public:
    void getColor(unsigned char* toFill, double* am, double* op, double* ref, Autonoma* r, Ray ray, unsigned int depth,unsigned int* data1, double* data2, double* data3);
    Vector getNormal(Vector point,unsigned int* data1, double* data2, double* data3);
 };
-
-
-#endif

@@ -31,18 +31,12 @@ Triangle::Triangle(Vector c, Vector b, Vector a, Texture* t):Plane(Vector(0,0,0)
    up.y = ycos*zcos+xsin*ysin*zsin;
    up.z = -xcos*ysin;
    Vector temp = vect.cross(right);
-   //printf("(%f %f %f) (%f %f %f)\n", up.x, up.y, up.z, temp.x, temp.y, temp.z);
    Vector np = solveScalers(right, up, vect, a-c);
    textureY = np.y;
    thirdX = np.x;
    
    d = -vect.dot(center);
-   //printf("%f %f N(%f %f %f) R(%f %f %f) U(%f %f %f) tx:%f ty:%f a:%f\n", textureY, thirdX, vect.x, vect.y, vect.z, right.x, right.y, right.z, up.x, up.y, up.z, textureX, textureY, thirdX);
 }
-/*
-Triangle::Triangle(const Vector &c, Texture* t, double ya, double pi, double ro, double tx):Plane(c, t, ya, pi, ro, tx,tx){}
-*/
-
 
 double Triangle::getIntersection(Ray ray,unsigned int* data1, double* data2, double* data3){
    double time = Plane::getIntersection(ray, data1, data2, data3);

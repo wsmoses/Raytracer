@@ -119,25 +119,6 @@ void getLight(double* tColor, Autonoma* aut, Vector point, Vector norm, unsigned
       bool hit = false;
       while(!hit && shapeIter!=NULL){
         hit = shapeIter->data->getLightIntersection(Ray(point+ra*.01, ra), lightColor);
-         /*
-         double time = shapeIter->data->getIntersection(Ray(point+ra*.01, ra), &data1, &data2, &data3);
-         if(time>1E-9 && time<1){
-            unsigned char toFill[3];
-            double opacity, reflection, ambient;
-            if(shapeIter->data->texture->constant())
-               shapeIter->data->texture->getColor(toFill, &ambient, &opacity, &reflection, 0., 0.);
-            else
-               shapeIter->data->getColor(toFill, &ambient, &opacity, &reflection, aut, Ray(point+ra*(.01+time), ra), aut->depth, &data1, &data2, &data3);
-            if(opacity>1-1E-9) { hit = true;
-               break;
-            }
-            toFill[0] = (unsigned char)((1-opacity)*toFill[0]);
-            toFill[1] = (unsigned char)((1-opacity)*toFill[1]);
-            toFill[2] = (unsigned char)((1-opacity)*toFill[2]);
-            if(toFill[0]<lightCol[0]) lightCol[0] = toFill[0];
-            if(toFill[1]<lightCol[1]) lightCol[1] = toFill[1];
-            if(toFill[2]<lightCol[2]) lightCol[2] = toFill[2];
-         }*/
          shapeIter = shapeIter->next;
       }
       double perc = (norm.dot(ra)/(ra.mag()*norm.mag()));
@@ -151,8 +132,6 @@ void getLight(double* tColor, Autonoma* aut, Vector point, Vector norm, unsigned
          if(tColor[0]>1.) tColor[0] = 1.;
          if(tColor[1]>1.) tColor[1] = 1.;
          if(tColor[2]>1.) tColor[2] = 1.;
-/*         tColor[1] = ground(perc*(lightCol[1])/255.+tColor[1]);
-         tColor[2] = ground(perc*(lightCol[2])/255.+tColor[2]);*/
         }
       }
       t =t->next;

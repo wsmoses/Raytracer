@@ -1,6 +1,5 @@
 #include "disk.h"
 Disk::Disk(const Vector &c, Texture* t, double ya, double pi, double ro, double tx, double ty):Plane(c, t, ya, pi, ro, tx, ty){}
-Disk::Disk(const Vector &c, Texture* t, double ya, double pi, double ro, double tx):Plane(c, t, ya, pi, ro, tx, tx){}
 
 
 double Disk::getIntersection(Ray ray, unsigned int* data1, double* data2, double* data3){

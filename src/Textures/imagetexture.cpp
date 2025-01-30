@@ -5,42 +5,11 @@ unsigned char ImageTexture::constant(){
 
 void ImageTexture::getColor(unsigned char* toFill, double* am, double *op, double *ref, double x, double y){
    int xi = (int)(x*w), yi = (int)(y*h);
- //  int xp, yp;   
- //  double dx = x*w-xi-.5;
- //  double dy = y*h-yi-.5;
-   
-  // if(dx<0) xp = (xi<=0)?0:(xi-1);
- //  else xp = (xi>=w-1)?(w-1):(xi+1);
-   
-  // if(dy<0) yp = (yi<=0)?0:(yi-1);
-  // else yp = (yi>=h-1)?(h-1):(yi+1);
- //  dx = 2*fabs(dx);
-  // dy = 2*fabs(dy);
-
    int p1 = 4*(xi+w*yi);
-  // int px = 4*(xp+w*yi);
-  // int py = 4*(xi+w*yp);
-  // int pxy = 4*(xi+w*yp);
-   
-   /* toFill[0] = (unsigned char)((imageData[p1]*(1-dy)*(1-dx)+imageData[px]*dx*(1-dy)+imageData[py]*dy*(1-dx)+imageData[pxy]*dx*dy));
-   toFill[1] = (unsigned char)((imageData[p1+1]*(1-dy)*(1-dx)+imageData[px+1]*dx*(1-dy)+imageData[py+1]*dy*(1-dx)+imageData[pxy+1]*dx*dy));
-   toFill[2] = (unsigned char)((imageData[p1+2]*(1-dy)*(1-dx)+imageData[px+2]*dx*(1-dy)+imageData[py+2]*dy*(1-dx)+imageData[pxy+2]*dx*dy));
-   *op = ((imageData[p1+3]*(1-dy)*(1-dx)+imageData[px+3]*dx*(1-dy)+imageData[py+3]*dy*(1-dx)+imageData[pxy+3]*dx*dy))*opacity/255.;
-   */
-   
    toFill[0] = imageData[p1];
    toFill[1] = imageData[p1+1];
    toFill[2] = imageData[p1+2];
    *op = imageData[p1+3]*opacity/255.;
-   
-   
-   //if(imageData[p1+3]!=255){printf("G:%d %d %f\n",p1, imageData[p1+3], *op);}
-  /*
-   toFill[0] = (unsigned char)interpolate(interpolate(imageData[py],imageData[pxy], dx),interpolate(imageData[p1],imageData[px], dx), dy);
-   toFill[1] = (unsigned char)interpolate(interpolate(imageData[py+1],imageData[pxy+1], dx),interpolate(imageData[p1+1],imageData[px+1], dx), dy);
-   toFill[2] = (unsigned char)interpolate(interpolate(imageData[py+2],imageData[pxy+2], dx),interpolate(imageData[p1+2],imageData[px+2], dx), dy);
-   *op = interpolate(interpolate(imageData[py+3],imageData[pxy+3], dx),interpolate(imageData[p1+3],imageData[px+3], dx), dy)*opacity/255.;
-  */
    *ref = reflection;
    *am = ambient;
 }
@@ -55,7 +24,6 @@ int x,y;
             imageData[total]=255;
             imageData[total+1]=255;
             imageData[total+2]=255;
-         //   printf("setting: %d %d %d\n", x, y, imageData[total+3]);
          }
       }          
 }
@@ -72,7 +40,6 @@ int x,y;
             imageData[total+1]=gm;
             imageData[total+2]=bm;
             imageData[total+3]=m;
-         //   printf("setting: %d %d %d\n", x, y, imageData[total+3]);
          }
       }          
 }
@@ -262,7 +229,6 @@ void ImageTexture::readPPM(FILE* f, char* file){
          printf("Could not find width / height -3- %d %d %d\n", r, w, h);
          exit(0);
       }
-   //      fseek(f, 1, SEEK_CUR); /* skip one byte, should be whitespace */
       int d;
       r = fscanf(f, "%u", &d);
       if ( (r < 1) || ( d != 255 ) ){
@@ -282,9 +248,13 @@ void ImageTexture::readPPM(FILE* f, char* file){
       for(y = h-1; y>=0; y--)
          for(x = 0; x<w; x++){
             int total = 4*(x+y*w);
-            fscanf(f, "%u", &imageData[total]);
-            fscanf(f, "%u", &imageData[total+1]);
-            fscanf(f, "%u", &imageData[total+2]);
+            unsigned int tmp;
+            fscanf(f, "%u", &tmp);
+            imageData[total] = (unsigned char)tmp;
+            fscanf(f, "%u", &tmp);
+            imageData[total+1] = (unsigned char)tmp;
+            fscanf(f, "%u", &tmp);
+            imageData[total+2] = (unsigned char)tmp;
             imageData[total+3] = 255;
          }
    }
@@ -306,7 +276,7 @@ ImageTexture::ImageTexture(char* file):Texture(.3, 1., 0.){
    }
    else{
       char command[2000];
-      sprintf(command, "convert %s ppm:-", file);
+      snprintf(command, sizeof(command), "convert %s ppm:-", file);
       FILE* f = popen(command, "r");
       readPPM(f, file);
       fclose(f);

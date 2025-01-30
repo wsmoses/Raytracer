@@ -41,7 +41,7 @@ int fpeek(FILE *stream)
    return c;
 }
   
-bool extensionEquals(char* a, char* knownExt){
+bool extensionEquals(char* a, const char* knownExt){
    while(*a!='\0'){
       if(a[0] != knownExt[0]) 
          return false;
