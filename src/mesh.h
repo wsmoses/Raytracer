@@ -10,9 +10,8 @@ public:
    unsigned int polyCount;
    Vector boundCenter;
    double radius;
-   Mesh(Vector* points, unsigned int pointCount, unsigned int* polys, unsigned int polyCountt, Texture* t);
-   Mesh(char* pointL, unsigned int pointCount, char* polyL, unsigned int polyCountt, Texture* t);
-   Mesh(const Vector &cente, Texture* t, double ya, double pi, double ro, double tx, double ty, Vector* points, unsigned int pointCount, unsigned int* polys, unsigned int polyCountt);
+   Mesh(Vector offset, Vector* points, unsigned int pointCount, unsigned int* polys, unsigned int polyCountt, Texture* t);
+   Mesh(Vector offset, char* pointL, unsigned int pointCount, char* polyL, unsigned int polyCountt, Texture* t);
    double getIntersection(Ray ray, unsigned int* data1, double* data2, double* data3);
    void move();
    void getColor(unsigned char* toFill, double* am, double* op, double* ref, Autonoma* r, Ray ray, unsigned int depth, unsigned int *data1, double *data2, double *data3);
@@ -22,7 +21,7 @@ public:
    void setYaw(double d);
    void setPitch(double d);
    void setRoll(double d);
-   void refreshBounds(Vector* points, unsigned int length) ;
+   void refreshBounds(Vector* points, Vector offset, unsigned int length) ;
    bool getLightIntersection(Ray ray, double* fill);
 };
 

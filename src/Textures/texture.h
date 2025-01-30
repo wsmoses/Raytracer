@@ -20,7 +20,7 @@ public:
 
  double interpolate(double a,double b,double x);
  
-char* findExtension(char* s);
+const char* findExtension(const char* s);
 
 double ground(double e);
 
@@ -29,5 +29,5 @@ double fix(double a);
 char lowerCase(char c);
 
 int fpeek(FILE* f);
-bool extensionEquals(char* a, const char* knownExt);
+bool extensionEquals(const char* a, const char* knownExt);
 #endif

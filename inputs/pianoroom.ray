@@ -1,0 +1,217 @@
+# Camera position 
+1.502048 0 -2.499250 1.5 0 0
+
+# Background
+color
+0 0 255
+
+# Light
+light
+0 5 0 255 255 255
+
+# back wall
+disk
+100 -30 0 0 1.5707963267948966 0 30 30
+# wall color
+color
+255 0 0 1 0 0.3
+# wall texture
+null
+
+# tiled floor
+plane
+0 -30 0 0.78539816339744828 1.5707963267948966 0 20 20
+# floor color
+inlineimage
+2 2 1 0.2 0.3
+0 0 0
+255 255 255
+255 255 255
+0 0 0
+# floor texture
+null
+
+
+# back left wall
+plane
+300 0 20 0 0.78539816339744828 1.5707963267948966 0 2 2
+# wall color
+color
+150 150 150 1 0 0.3
+# wall texture
+null
+
+
+# back right wall
+plane
+300 0 -20 0 -0.78539816339744828 1.5707963267948966 0 2 2
+# wall color
+color
+0 0 0 1 0.8 0.3
+# wall texture
+null
+
+# pink leaning on left wall
+box
+220 50 50 0.78 0 0 30 10
+# wall color
+color
+250 00 150 1 0 0.3
+# wall texture
+null
+
+# green box standing up left wall
+box
+217 45 47 -2.35619449019 1.5707963267948966 0 30 10
+# wall color
+color
+0 250 150 1 0 0.3
+# wall texture
+null
+
+# pink leaning on left wall
+box
+213.67544468 40 43.6754446797 0.78 0 0 30 10
+# wall color
+color
+250 00 150 1 0 0.3
+# wall texture
+null
+
+
+# green box standing up left wall
+box
+210.513167019 35 40.5131670195 -2.35619449019 1.5707963267948966 0 30 10
+# wall color
+color
+0 250 150 1 0 0.3
+# wall texture
+null
+
+# pink leaning on left wall
+box
+207.350889359 30 37.3508893593 0.78 0 0 30 10
+# wall color
+color
+250 00 150 1 0 0.3
+# wall texture
+null
+
+
+
+# green box standing up left wall
+box
+204.188611699 25 34.188611699 -2.35619449019 1.5707963267948966 0 30 10
+# wall color
+color
+0 250 150 1 0 0.3
+# wall texture
+null
+
+# pink leaning on left wall
+box
+201.026334039 20 31.026334039 0.78 0 0 30 10
+# wall color
+color
+250 00 150 1 0 0.3
+# wall texture
+null
+
+# green box standing up left wall
+box
+197.864056379 15 27.864056379 -2.35619449019 1.5707963267948966 0 30 10
+# wall color
+color
+0 250 150 1 0 0.3
+# wall texture
+null
+
+# pink leaning on left wall
+box
+194.701778719 10 24.701778719 0.78 0 0 30 10
+# wall color
+color
+250 00 150 1 0 0.3
+# wall texture
+null
+
+# green box standing up left wall
+box
+191.539501058 5 21.539501058 -2.35619449019 1.5707963267948966 0 30 10
+# wall color
+color
+0 250 150 1 0 0.3
+# wall texture
+null
+
+# pink leaning on left wall
+box
+188.377223398 0 18.377223398 0.78 0 0 30 10
+# wall color
+color
+250 00 150 1 0 0.3
+# wall texture
+null
+
+# green box standing up left wall
+box
+185.214945738 -5 15.214945738 -2.35619449019 1.5707963267948966 0 30 10
+# wall color
+color
+0 250 150 1 0 0.3
+# wall texture
+null
+
+# pink leaning on left wall
+box
+182.052668078 -10 12.052668078 0.78 0 0 30 10
+# wall color
+color
+250 00 150 1 0 0.3
+# wall texture
+null
+
+
+# green box standing up left wall
+box
+178.890390418 -15 8.890390418 -2.35619449019 1.5707963267948966 0 30 10
+# wall color
+color
+0 250 150 1 0 0.3
+# wall texture
+null
+
+# pink leaning on left wall
+box
+175.728112758 -20 5.728112758 0.78 0 0 30 10
+# wall color
+color
+250 00 150 1 0 0.3
+# wall texture
+null
+
+
+# green box standing up left wall
+box
+172.565835097 -25 2.565835097 -2.35619449019 1.5707963267948966 0 30 10
+# wall color
+color
+0 250 150 1 0 0.3
+# wall texture
+null
+
+# pink leaning on left wall
+box
+169.403557437 -30 -0.596442563 0.78 0 0 30 10
+# wall color
+color
+250 00 150 1 0 0.3
+# wall texture
+null
+
+sphere
+120 30 50 0 0 0 20
+color
+0 0 255 1 0 0.3
+null
+

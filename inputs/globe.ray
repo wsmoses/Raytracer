@@ -1,0 +1,46 @@
+# Camera position 
+0 0 0 0 0 0
+
+# Background
+image
+images/skybox.jpg
+
+# Light
+light
+0 5 0 255 255 255
+
+# tiled floor
+plane
+0 -30 0 0.78539816339744828 1.5707963267948966 0 20 20
+# floor color
+inlineimage
+2 2 1 0.8 0.3
+0 0 255
+100 255 255
+100 255 255
+0 0 255
+# floor texture
+null
+
+# tiled floor
+plane
+0 -20 0 0.78539816339744828 1.5707963267948966 0 20 20
+# floor color
+color
+0 100 255 0.2 0.1 0.5
+# floor texture
+image
+images/sea.jpg
+
+sphere
+20 20 150 0 0 0 40
+image
+images/world.jpg
+image
+images/EarthNormalMap.png
+
+sphere
+20 20 150 0 0 0 40.1
+maskedimage
+images/cloud.jpg
+null

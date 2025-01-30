@@ -17,10 +17,10 @@ double fix(double a){
 double ground(double e){
    return (e>1.)?1.:e;
 }
-char* findExtension(char* ola){
-   char* end = ola;
+const char* findExtension(const char* ola){
+   const char* end = ola;
    while(*end!='\0') end++;
-   char* start = end;
+   const char* start = end;
    while(*start!='.' && start>ola) start--;
    if(*start=='.') start++;
    return start;
@@ -41,7 +41,7 @@ int fpeek(FILE *stream)
    return c;
 }
   
-bool extensionEquals(char* a, const char* knownExt){
+bool extensionEquals(const char* a, const char* knownExt){
    while(*a!='\0'){
       if(a[0] != knownExt[0]) 
          return false;

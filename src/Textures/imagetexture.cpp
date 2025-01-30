@@ -171,7 +171,7 @@ ImageTexture::ImageTexture(unsigned char* data, unsigned int ww, unsigned int hh
    h = hh;
 }
 
-void ImageTexture::readPPM(FILE* f, char* file){
+void ImageTexture::readPPM(FILE* f, const char* file){
    if (f == NULL){
       printf("File loading error!!! %s\n", file);
       exit(0);
@@ -266,8 +266,8 @@ void ImageTexture::readPPM(FILE* f, char* file){
 
 
 }
-ImageTexture::ImageTexture(char* file):Texture(.3, 1., 0.){
-   char* ext = findExtension(file);
+ImageTexture::ImageTexture(const char* file):Texture(.3, 1., 0.){
+   const char* ext = findExtension(file);
    if(extensionEquals(ext, "ppm")){
    
       FILE* f = fopen(file, "r");
@@ -276,10 +276,10 @@ ImageTexture::ImageTexture(char* file):Texture(.3, 1., 0.){
    }
    else{
       char command[2000];
-      snprintf(command, sizeof(command), "convert %s ppm:-", file);
+      snprintf(command, sizeof(command), "magick %s ppm:-", file);
       FILE* f = popen(command, "r");
       readPPM(f, file);
-      fclose(f);
+      pclose(f);
    }
 
 

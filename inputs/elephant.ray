@@ -1,0 +1,29 @@
+# Camera position 
+0 0 0 0 0 0
+
+# Background
+color
+0 0 255
+
+# Light
+light
+0 2 2 255 255 255
+
+# sphere
+# 2.1219073006842004 0.35032710569592768 1.3951687170746547 0 0 0 3
+# 20.1219073006842004 0.35032710569592768 1.3951687170746547 0 0 0 3
+# color
+# 250 255 150 1 0 0.3
+# wall texture
+# null
+
+
+# elephant
+mesh
+data/x.txt 1586 data/f.txt 3168 -1.58 -.43 2.7
+# data/elepx.txt 62779 data/elepf.txt 111748 -1.58 -.43 2.7
+# wall color
+color
+250 255 150 1 0 0.3
+# wall texture
+null

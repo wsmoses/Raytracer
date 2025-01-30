@@ -1,7 +1,7 @@
 FUNC := g++
 copt := -c 
 output :=-o 
-FLAGS := -O3 -Werror
+FLAGS := -O3 -g -Werror
 OBJ_DIR :=./
 
 CPP_FILES := $(wildcard *.cpp)
