@@ -8,7 +8,7 @@
 #include "src/disk.h"
 #include "src/hyperboloid.h"
 #include "src/mandel.h"
-#include "src/mesh.h"
+#include "src/triangle.h"
 #include "src/Textures/imagetexture.h"
 #include "src/Textures/functiontexture.h"
 #include "src/Textures/fractalnoise.h"
@@ -188,6 +188,27 @@ Texture* parseTexture(FILE* f, bool allowNull) {
    exit(1);
 }
 
+
+Vector* getVectors(FILE* f, int len){
+   Vector* vec = (Vector*)malloc(len*sizeof(Vector));
+   float x, y, z;
+   for(int i = 0; i<len; i++){
+      fscanf(f, "%f %f %f\n", &x, &y, &z);
+      vec[i].x = x;
+      vec[i].y = y;
+      vec[i].z = z;
+   }
+   return vec;
+}
+unsigned int* getTriangles(FILE* f, int len){
+   unsigned int* vec = (unsigned int*)malloc(3*len*sizeof(unsigned int));
+   int a, b, d;
+   for(int i = 0; i<3*len; i+=3){
+      fscanf(f, "%d %d %d\n", &vec[i], &vec[i+1], &vec[i+2]); 
+   }
+   return vec;
+}
+
 Autonoma* createInputs(const char* inputFile) {
    
    double camera_x = 0;
@@ -302,9 +323,27 @@ Autonoma* createInputs(const char* inputFile) {
                exit(1);
             }
             Texture *texture = parseTexture(f, false);
-            Mesh* shape = new Mesh(Vector(off_x, off_y, off_z), point_filepath, num_points, poly_filepath, num_polygons, texture);
-            MAIN_DATA->addShape(shape);
-            shape->normalMap = parseTexture(f, true);
+            Texture *normalMap = parseTexture(f, true);
+
+            FILE* vectors = fopen(point_filepath,"r"), *triangles = fopen(poly_filepath,"r");
+            if (!vectors) {
+               printf("Could not open point file %s\n", point_filepath);
+               exit(1);
+            }
+            if (!triangles) {
+               printf("Could not open triangles file %s\n", poly_filepath);
+               exit(1);
+            }
+            Vector* points = getVectors(vectors, num_points);
+            fclose(vectors);
+            unsigned int* polys = getTriangles(triangles, num_polygons);
+            fclose(triangles);
+            Vector offset(off_x, off_y, off_z); 
+            for(int i = 0; i<num_polygons; i++){
+               Triangle* shape = new Triangle(points[polys[3*i]] + offset, points[polys[3*i+1]] + offset, points[polys[3*i+2]] + offset, texture);
+               MAIN_DATA->addShape(shape);
+               shape->normalMap = normalMap;
+            }
          } else {
            printf("Unknown object type %s\n", object_type);
            exit(1);
