@@ -25,7 +25,6 @@ public:
    void maskImage(ColorTexture* b);
    void maskImage(ColorTexture* b, unsigned char m);
    void maskImageAlpha();
-   unsigned char constant();
 };
 
 #endif

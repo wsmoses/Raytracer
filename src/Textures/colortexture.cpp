@@ -21,6 +21,3 @@ void ColorTexture::getColor(unsigned char* toFill, double* amb, double *op, doub
    *ref = reflection;
    *amb = ambient;
 }
-
-unsigned char ColorTexture::constant(){ 
-   return 1; }

@@ -47,12 +47,12 @@ class Shape{
    Texture* texture;
    double textureX, textureY, mapX, mapY, mapOffX, mapOffY;
    Texture* normalMap;
-   virtual double getIntersection(Ray ray, unsigned int* data1, double* data2, double* data3) = 0;
+   virtual double getIntersection(Ray ray) = 0;
    virtual bool getLightIntersection(Ray ray, double* fill) = 0;
    virtual void move() = 0;
-   virtual unsigned char reversible(unsigned int* data1, double* data2, double* data3) = 0;
-   virtual void getColor(unsigned char* toFill, double* am, double* op, double* ref, Autonoma* r, Ray ray, unsigned int depth, unsigned int* data1, double* data2, double* data3) = 0;
-   virtual Vector getNormal(Vector point, unsigned int* data1, double* data2, double* data3) = 0;
+   virtual unsigned char reversible() = 0;
+   virtual void getColor(unsigned char* toFill, double* am, double* op, double* ref, Autonoma* r, Ray ray, unsigned int depth) = 0;
+   virtual Vector getNormal(Vector point) = 0;
    virtual void setAngles(double yaw, double pitch, double roll) = 0;
    virtual void setYaw(double d) = 0;
    virtual void setPitch(double d) = 0;

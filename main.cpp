@@ -6,13 +6,8 @@
 #include "src/light.h"
 #include "src/box.h"
 #include "src/disk.h"
-#include "src/hyperboloid.h"
-#include "src/mandel.h"
 #include "src/triangle.h"
 #include "src/Textures/imagetexture.h"
-#include "src/Textures/functiontexture.h"
-#include "src/Textures/fractalnoise.h"
-#include "src/Textures/mandeltexture.h"
 #include "src/Textures/colortexture.h"
 #include<stdio.h>
 #include<stdlib.h>
@@ -121,16 +116,6 @@ Texture* parseTexture(FILE* f, bool allowNull) {
       }
       return new ColorTexture((unsigned char)r, (unsigned char)g, (unsigned char)b, opacity, reflection, ambient);
    }
-   if (streq(texture_type, "fractal")) {
-      double x, y;
-      double xoff, yoff;
-      double evolution;
-      if (lscanf(f, "%lf %lf %lf %lf %lf\n", &x, &y, &xoff, &yoff, &evolution) == EOF) {
-         printf("Could not read <r> <g> <b> <opacity> <reflection> <ambient>\n");
-         exit(1);
-      }
-      return new FractalNoise(x, y, xoff, yoff, evolution);
-   }
    if (streq(texture_type, "image")) {
       char image_file[100];
       if (lscanf(f, "%s\n", image_file) == EOF) {
@@ -172,16 +157,6 @@ Texture* parseTexture(FILE* f, bool allowNull) {
       text->reflection = reflection;
       text->ambient = ambient;
       return text;
-   }
-   if (streq(texture_type, "mandel")) {
-      double x, y;
-      double h, w;
-      int escape;
-      if (lscanf(f, "%lf %lf %lf %lf %d\n", &x, &y, &h, &w, &escape) == EOF) {
-         printf("Could not read <x> <y> <height> <width> <escape limit>\n");
-         exit(1);
-      }
-      return new MandelTexture(x, y, h, w, escape);
    }
 
    printf("Unknown texture type \"%s\"\n", texture_type);
@@ -450,19 +425,6 @@ void setFrame(const char* animateFile, Autonoma* MAIN_DATA, int frame, int frame
          }
       }
    }
-    //  mand->setYaw(exp((double)frame/48)); 
-     // mars->setYaw(-(double)frame/24);
-
-   /*
-   MAIN_DATA->camera.setPitch(M_PI*frame/frameLen);
-   MAIN_DATA->camera.setYaw(2*M_PI*(.25-(double)frame/frameLen));
-   MAIN_DATA->camera.focus.z = -2.499250-sin(2*M_PI*frame/frameLen);
-   MAIN_DATA->camera.focus.x = 1.502048-cos(2*M_PI*frame/frameLen);
-   */
-
-    //   pl->mapOffY = (double)frame/48;
-    //   mars->setYaw((double)-frame/frameLen*M_TWO_PI);
-    //   cl->setYaw((double)frame/48*M_TWO_PI);
 
    refresh(MAIN_DATA);
 }

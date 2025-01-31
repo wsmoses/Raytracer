@@ -34,7 +34,6 @@ public:
   ColorTexture(unsigned char aa, unsigned char bb, unsigned char cc, double alp, double ref, double amb);
   ColorTexture(char* def);
   void getColor(unsigned char* toFill, double* amb, double *op, double *ref, double x, double y);
-  unsigned char constant();
 };
 
 #endif

@@ -6,7 +6,7 @@ class Triangle : public Plane{
 public:
    double thirdX;
    Triangle(Vector c, Vector b, Vector a, Texture* t);
-   double getIntersection(Ray ray,unsigned int* data1, double* data2, double* data3);
+   double getIntersection(Ray ray);
    bool getLightIntersection(Ray ray, double* fill);
 };
 
